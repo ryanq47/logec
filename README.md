@@ -1,4 +1,4 @@
-For those who just want to get started:
+For those who just want to get started: <br>
 run 'pip install -r requirements.txt' to install needed packages <br>
 Then, run 'event_generate.sh' to generate some data to look at!
 
