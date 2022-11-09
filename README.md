@@ -13,7 +13,7 @@ Some important definitions: <br>
 
   >> Shell: The shell is the frontend for the sorter, its main functions are to interact with the sorter via commands, and display results. <br>
 
-  > Sorter: The sorter is where all the heavy lifting happens, it searches, and sorts its respective log file for values via regex. Fromt here, it adds
+  >> Sorter: The sorter is where all the heavy lifting happens, it searches, and sorts its respective log file for values via regex. Fromt here, it adds
           this data to a dataframe, and returns it to the shell to display <br>
 <br>
 Here is a handy chart showing a map of this, with explanations as well:<br>
