@@ -20,8 +20,8 @@ Here is a handy chart showing a map of this, with explanations as well:<br>
 
 ![image](https://user-images.githubusercontent.com/91687869/200751535-36431c39-8345-40b4-b094-774eaa396648.png)
 <br>
-
+***EXAMPLES***:  <br>
 **General Usage:** <br>
 
-the main page, where you can access different modules <br>
+The main shell, where you can access different modules, or tools <br>
 ![image](https://user-images.githubusercontent.com/91687869/200749965-538642b5-0a8f-41c9-a897-a0923b80be8a.png)
