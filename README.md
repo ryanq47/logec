@@ -11,6 +11,7 @@ Some important definitions: <br>
 
 Module: A grouping of 2 programs (sorter, and shell) related to a single log (confusing I know) <br>
   > Shell: The shell is the frontend for the sorter, its main functions are to interact with the sorter via commands, and display results. <br>
+
   > Sorter: The sorter is where all the heavy lifting happens, it searches, and sorts its respective log file for values via regex. Fromt here, it adds
           this data to a dataframe, and returns it to the shell to display <br>
 <br>
