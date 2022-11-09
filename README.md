@@ -29,7 +29,7 @@ The main shell, where you can access different modules, or tools <br>
 
 **Configuration:** <br>
 
-There is a fair amount of configuration available,or coming to logec in future updates. For now, you can customize the locations of your logs with
+There is a fair amount of configuration coming to logec in future updates. For now, you can customize the locations of your logs with
 log_locations.yml <br>
 
 ![image](https://user-images.githubusercontent.com/91687869/200753280-6a953530-ef46-4ed9-a498-ec63e9c085d2.png)
