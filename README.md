@@ -24,10 +24,10 @@ Here is a handy chart showing a map of this, with explanations as well:<br>
 ***EXAMPLES***:  <br>
 **General Usage:** <br>
 
-**The main shell** This is where you can access different modules, or tools <br>
+**The main shell:** This is where you can access different modules, or tools <br>
 ![image](https://user-images.githubusercontent.com/91687869/200749965-538642b5-0a8f-41c9-a897-a0923b80be8a.png)<br>
 
-**Searching!** Searching works in all modules - and took some time to get right <br>
+**Searching!:** Searching works in all modules - and took some time to get right <br>
 ![image](https://user-images.githubusercontent.com/91687869/200754004-b4a901ce-489f-4b6e-917d-4d742557713a.png) <br>
 
 
