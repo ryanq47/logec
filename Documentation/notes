@@ -1,0 +1,80 @@
+
+	Explore this: https://www.geeksforgeeks.org/how-to-speedup-pandas-with-with-one-line-change-using-modin/
+	its a multithreaded pandas basically
+	
+	
+Last left off: Working on user install, and setfacl getting proper permissions to see log files
+	       Need to get it added to path, being dumb
+## Note!! if unable to properly/efficently parse a log, just have 1 column, each log line will be it's own line, then it is possible to search 
+
+==========================================================================================================================================================================
+General Notes:
+Hiearchy: Parent shell (logec.py) > Child Shell (ex: ws_shell.py) -> sorter (ex webserver_sorter.py)
+
+Color scheme:
+Blue: INFO
+green: Success
+red: Failed
+Orange/yellow: Warning
+
+==========================================================================================================================================================================
+changelog: 
+
+9:30 - 10/20/22: Created update file, started integrity tool, 
+
+10:29 - 08/20/22: Moved over to shell instead of a command per query, added a draw.io map of the basics as well. All notes/documentation is moved to documentation folder
+
+13:31 -08/11/22: Added tabcompletion and history, found ram issue 
+
+18:23 10-14-2022: got a solution for ram usage, in ramload_test_listtry, only problem now is that tehre is an inital spike wehn loading,
+	so need to find a way to set those datatypes pre load
+
+22:46 10-14-2022: turned the dict's into lists, then discovered tuples work, which are way less memroy intensive. log function is complete - there is a way to reduce more memory but rn its good enough
+
+00:45 10-30-22: Fixed the looping issue with log/search by taking out the init lists on each call to log or search. 
+
+10:34 10-30-22: Fixed empty DF error, see issue #1
+
+12:05 11-3-22: Created basic template for sorters, startedon auth log
+==========================================================================================================================================================================
+Issuelog: 
+
+#2 15:14 - 08/26/22 | HIGH: fix search, the ws_shell, and webserver_sorter sees the term, but is not filtering correctly - ?? not sure what this means
+
+#3 15:14 - 08/16/22 | Priority: Medium /\ Ram usage fixed for loading, now need to figure out how to optimize the regex to use less ram
+
+#4 15:15 - 08/16/22 | Priority: Medium /\ organize/rewire the ws_shell, its very messy
+
+#5 10:29 - 08/31/22 | priortiy: medium /\ agent search is verrrry slow for large logs, either have an option to disable it, or find a way to speed it up
+
+#6 10:29 - 08/31/22 | priortiy: low /\ memory leak when exiting a module (via home command) neeed to clear variables/df's on home command
+==========================================================================================================================================================================
+Archived Issuelog: 
+
+#1 | 10:29 - 08/10/22 | Priority: Medium /\ Performance is a little slow between shells modules (try typing log in webserver) see if that can't be cleaned up/made faster
+		## Solution: File reads, there one one "open" instance of the file, and only one function/variable can read it at a time via python, and as such they were fighting over who gets the file
+
+
+==========================================================================================================================================================================
+Features:
+	20:32 - 10/20/22 | high: Idea, integrity, creates a local copy of files, and  stores them.
+		from there, can check if original file  (ex /etc/apache.conf) has been changed.
+			in module, checks just the module's files, outof module, checks all
+	
+	? - ? |low: Rich Print gui fancy display for data (RICH DASHBOARD)
+		Work: High
+	? - ? : All Log search, take all the logs, put in a temp file, and then use pandas to search them
+		work: Medium
+	
+	23:16 - 08/26/22 | Medium: Ingrate Moudle into IP rep check, the manually entered IP works
+
+
+==========================================================================================================================================================================
+
+documentation:
+	tab completion: https://sites.google.com/site/xiangyangsite/home/technical-tips/software-development/python/python-readline-completions
+
+
+==========================================================================================================================================================================
+Vuln scans with bandit:
+apt-get install bandit, bandit file.py

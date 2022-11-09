@@ -1,0 +1,4 @@
+## General
+startup:
+  auto-update: False
+  print-settings-on-startup: True

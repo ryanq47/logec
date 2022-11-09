@@ -1,0 +1,12 @@
+webserver:
+    dir: /var/log/apache2/access.log
+
+syslog:
+    auth:
+        dir: /var/log/auth.log
+    syslog:
+        dir: /var/log/syslog
+
+integrity:
+    webserver:
+        dir: /etc/apache2/apache2.conf
