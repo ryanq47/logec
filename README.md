@@ -25,7 +25,15 @@ Here is a handy chart showing a map of this, with explanations as well:<br>
 **General Usage:** <br>
 
 The main shell, where you can access different modules, or tools <br>
-![image](https://user-images.githubusercontent.com/91687869/200749965-538642b5-0a8f-41c9-a897-a0923b80be8a.png)
+![image](https://user-images.githubusercontent.com/91687869/200749965-538642b5-0a8f-41c9-a897-a0923b80be8a.png)<br>
+
+The Webserver Module:<br>
+![image](https://user-images.githubusercontent.com/91687869/200753677-b6fbf80b-059f-47e3-b531-08bbd1f6ad3a.png)<br>
+
+The Auth Module:<br>
+
+![image](https://user-images.githubusercontent.com/91687869/200753786-25b3ddf0-a15f-45f2-ac07-2deb46c303fb.png)<br>
+
 
 **Configuration:** <br>
 
