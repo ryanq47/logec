@@ -16,9 +16,9 @@ Some important definitions: <br>
   >> Sorter: The sorter is where all the heavy lifting happens, it searches, and sorts its respective log file for values via regex. Fromt here, it adds
           this data to a dataframe, and returns it to the shell to display <br>
 <br>
-Here is a handy chart showing a map of this, with explanations as well:<br>
+>Here is a handy chart showing a map of this, with explanations as well:<br>
 ![image](https://user-images.githubusercontent.com/91687869/200751535-36431c39-8345-40b4-b094-774eaa396648.png)
 <br>
 
-Here is the main page, where you can access different modules <br>
+>Here is the main page, where you can access different modules <br>
 ![image](https://user-images.githubusercontent.com/91687869/200749965-538642b5-0a8f-41c9-a897-a0923b80be8a.png)
