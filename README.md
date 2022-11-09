@@ -5,7 +5,7 @@ Then, run 'event_generate.sh' to generate some data to look at!<br>
 # Logec! <br>
 <br>
 Have you ever needed to really dig through some log files, but find yourself frustrated with AWK, GREP, and/or other tools? Well here is your solution!
-Logec is a localized SIEM, meant to help you get to the bottom of any troubles you have quickly. No forwarders, agents, or server isntances, just download and go! <br>
+Logec is a localized SIEM, meant to help you get to the bottom of any troubles you have quickly. No forwarders, agents, or server instances, just download and go! <br><br>
 
 Some important definitions: <br>
 
