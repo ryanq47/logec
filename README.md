@@ -20,6 +20,7 @@ Here is a handy chart showing a map of this, with explanations as well:<br>
 
 ![image](https://user-images.githubusercontent.com/91687869/200751535-36431c39-8345-40b4-b094-774eaa396648.png)
 <br>
+<br>
 ***EXAMPLES***:  <br>
 **General Usage:** <br>
 
