@@ -26,3 +26,11 @@ Here is a handy chart showing a map of this, with explanations as well:<br>
 
 The main shell, where you can access different modules, or tools <br>
 ![image](https://user-images.githubusercontent.com/91687869/200749965-538642b5-0a8f-41c9-a897-a0923b80be8a.png)
+
+**Configuration:** <br>
+
+There is a fair amount of configuration available,or coming to logec in future updates. For now, you can customize the locations of your logs with
+log_locations.yml <br>
+
+![image](https://user-images.githubusercontent.com/91687869/200753280-6a953530-ef46-4ed9-a498-ec63e9c085d2.png)
+
