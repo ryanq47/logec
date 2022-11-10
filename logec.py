@@ -34,7 +34,7 @@ try:
             print(c)
 
     def tab_completion(text,state):
-        vocab = ['help','whoami', 'banner', 'exit', 'clear', 'webserver','auth', 'reputation']
+        vocab = ['help','whoami', 'banner', 'exit', 'clear', 'webserver','auth', 'dpkg','reputation']
         results = [x for x in vocab if x.startswith(text)] + [None]
         return results[state]
 
@@ -86,6 +86,10 @@ Hit tab for all commands, or autofill
         elif input == "auth":
             import auth_shell as ass
             ass.loop()
+            
+        elif input == "dpkg":
+            import dpkg_shell as dss
+            dss.loop()
      
         # == Tools
         elif input == "tools":
@@ -115,9 +119,9 @@ Hit tab for all commands, or autofill
         elif input == "home":
             print("You are already home")
         else:
-            print("DANGEROUS< for debig only")
-            os.system(input)
-            #return("Invalid Command")
+            #print("DANGEROUS< for debug only")
+            #os.system(input)
+            return("Invalid Command")
 
 
     class shell_func:

@@ -1,4 +1,4 @@
-## sorter v2 auth.log -- only going for catching logins here 
+## sorter v2
 ## naming: item_action,
 
 ## error handling for imports
@@ -77,25 +77,22 @@ class sorter:
         
             ## filtering for each value
             for i in track(log_contents, description="Loading log file...", total=utility.file_count(LOG_DIR)):
-                command = extract.command(i) 
-                time = extract.time(i) 
-                tty = extract.TTY(i)
-                dir = extract.dir(i)
-                user = extract.user(i)
-                
-                data_format = [(time, tty, user, dir, command)]
+                ITEM = extract._ITEM(i) 
 
-                ## line to filter out non shell login logs - need to get the session opened ones in as well
-                if 'TTY' in i:
-                    ## The for loop is for the formatting so pandas can read/index it properly
-                    for i in data_format:
-                        data.lst_init.df_list.append(i)
-                else:
-                    pass
-                    #print("skipping line")
+
+                ## Doc: https://www.geeksforgeeks.org/creating-a-pandas-dataframe-using-list-of-tuples/
+                ## optmizing tuple: https://www.geeksforgeeks.org/tips-to-reduce-python-object-size/
+                ## tuple in a list, much easier on memry than dict in a list
+
+                data_format = [(ITEM)]
+
+                ## The for loop is for the formatting so pandas can read/index it properly
+                for i in data_format:
+                    data.lst_init.df_list.append(i)
 
             display.dataframe()
             main()
+
 
     def search(search_term):
         print(utility.size_check(LOG_DIR))
@@ -104,26 +101,15 @@ class sorter:
         with open(LOG_DIR, "r") as log_contents:
 
             for i in track(log_contents, description="Loading log file...", total = utility.file_count(LOG_DIR)):
-                command = extract.command(i) 
-                time = extract.time(i) 
-                tty = extract.TTY(i)
-                dir = extract.dir(i)
-                user = extract.user(i)
-                
-                data_format = [(time, tty, user, dir, command)] ## list of what is ablove, ex ip, host, etc
+                ITEM = extract._ITEM(i) 
+
+                data_format = [(ITEM)] ## list of what is ablove, ex ip, host, etc
                 
                 ## temp try except to fix search issues
                 try:
-                    if search_term in command:
+                    if search_term in ITEM_FUNCTION:
                         add = True
-                    elif search_term in time:
-                        add = True
-                    elif search_term in tty:
-                        add = True
-                    elif search_term in dir:
-                        add = True
-                    elif search_term in user:
-                        add = True
+               
                     else:
                         add = False
                         pass
@@ -137,42 +123,41 @@ class sorter:
             display.dataframe_search()
             main()
         
+    
 class display:
     
     ## seperate for my sanity
     def dataframe():
         display.dataframe_config()
-        df = pd.DataFrame(data.lst_init.df_list, columns=['TIME','TTY','USER', 'DIR', 'COMMAND'])
-
+        df = pd.DataFrame(data.lst_init.df_list, columns=['IP', 'TIME', 'LOCATION', 'METHOD', 'RESPONSE_CODE', 'URL', 'AGENT'])
+        #df.style.set_properties(**{'text-align': 'left'})
+        #To reduce mem usage, can set types like this (int8 = -128 to 127, int16 = -32k to 32k)
+        ## However, still getting mem spikes, so maybe these need to go infront somehow
+        #doc: https://skytowner.com/explore/reducing_dataframe_memory_size_in_pandas#:~:text=There%20are%20two%20main%20ways%20to%20reduce%20DataFrame,types%202%20Convert%20object%20columns%20to%20categorical%20columns
+        
         ## Setting astype which vastly reduces memory usage
-        df["COMMAND"] = df["COMMAND"].astype('category').str[:45] #int16
-        df["TTY"] = df["TTY"].astype('category')
-        df["USER"] = df["USER"].astype('category') 
-        df["DIR"] = df["DIR"].astype('category') 
-        df["TIME"] = df["TIME"].astype('category')
-
+        df["ITEM"] = df["ITEM"].astype('category') #int16
     
+          
         display.dataframe.df = df
 
     def dataframe_search():
         display.dataframe_config()
-        df = pd.DataFrame(data.lst_init.df_list_search, columns=['TIME','TTY','USER', 'DIR', 'COMMAND'])
+        df = pd.DataFrame(data.lst_init.df_list_search, columns=['ITEM'])
+        
+        #df.style.set_properties(**{'text-align': 'left'})
+        #To reduce mem usage, can set types like this (int8 = -128 to 127, int16 = -32k to 32k)
+        ## However, still getting mem spikes, so maybe these need to go infront somehow
+        #doc: https://skytowner.com/explore/reducing_dataframe_memory_size_in_pandas#:~:text=There%20are%20two%20main%20ways%20to%20reduce%20DataFrame,types%202%20Convert%20object%20columns%20to%20categorical%20columns
         
         ## Setting astype which vastly reduces memory usage
-        df["COMMAND"] = df["COMMAND"].astype('category') #int16
-        df["TTY"] = df["TTY"].astype('category') 
-        df["USER"] = df["USER"].astype('category') 
-        df["DIR"] = df["DIR"].astype('category') 
-        df["TIME"] = df["TIME"].astype('category') 
-
+        df["ITEM"] = df["ITEM"].astype('category') #int16
 
         display.dataframe_search.df = df
 
     def dataframe_config():
         # == DF options - need to go into config file eventaully
-        pd.options.display.width = 1
-        #pd.set_option('display.max_columns', None)
-        pd.options.display.max_rows = 100
+        pd.options.display.max_rows = 30
         pd.options.display.max_colwidth = 1 # tightens up DF 
         
         pd.set_option("display.colheader_justify","left")
@@ -187,6 +172,7 @@ class data:
         data.lst_init.df_list_search = []
         ## any other lists init here
     
+    ## used for freeing memory at the end of whatever
     def cleanup():
         data.lst_init()
 
@@ -196,55 +182,18 @@ class extract:
     def __init__(self):
         self.self = self
     
-    def command(iter):
-        command = re.compile(r'(COMMAND=).*')
+    def _ITEM(iter):
+        ITEM = re.compile(r'???')
         try:
-            extracted_command = command.search(iter)[0]
-            #print(extracted_command)
+            extracted_ITEM = ITEM.search(iter)[0]
         except:
-            extracted_command = "EMPTY"
-        return extracted_command.replace("COMMAND=","")
-
-    def TTY(iter):
-        tty = re.compile(r'(TTY=)([^\s]+)')
-        try:
-            extracted_tty = tty.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_tty = "EMPTY"
-        return extracted_tty.replace("TTY=","")
-
-    def dir(iter):
-        dir= re.compile(r'(PWD=)([^\s]+)')
-        try:
-            extracted_dir = dir.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_dir = "EMPTY"
-        return extracted_dir.replace("PWD=","")
-
-    def user(iter):
-        user = re.compile(r'(USER=)([^\s]+)')
-        try:
-            extracted_user = user.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_user = "EMPTY"
-        return extracted_user.replace("USER=","") 
-
-
-    def time(iter):
-        time = re.compile(r'..:..:..')
-        try:
-            extracted_time = time.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_time = "EMPTY"
-        return extracted_time
-
+            extracted_ITEM  = None
+            #print("Error Occured")
+        return extracted_ITEM 
     
+
+
 def main():
     data.lst_init()
     
 main()
-

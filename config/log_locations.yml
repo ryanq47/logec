@@ -4,6 +4,8 @@ webserver:
 syslog:
     auth:
         dir: /var/log/auth.log
+    dpkg:
+        dir: /var/log/dpkg.log
     syslog:
         dir: /var/log/syslog
 

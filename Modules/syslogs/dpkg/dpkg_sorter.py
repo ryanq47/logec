@@ -1,4 +1,4 @@
-## sorter v2 auth.log -- only going for catching logins here 
+## sorter v2
 ## naming: item_action,
 
 ## error handling for imports
@@ -50,7 +50,7 @@ class inits:
     def log_dir():
         with open("config/log_locations.yml", "r") as ymlfile:
             cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
-        return (cfg["syslog"]["auth"]["dir"])
+        return (cfg["syslog"]["dpkg"]["dir"])
 
     # Needs to be called from the shell script
     def search_term(input):
@@ -77,25 +77,19 @@ class sorter:
         
             ## filtering for each value
             for i in track(log_contents, description="Loading log file...", total=utility.file_count(LOG_DIR)):
-                command = extract.command(i) 
                 time = extract.time(i) 
-                tty = extract.TTY(i)
-                dir = extract.dir(i)
-                user = extract.user(i)
+                date = extract.date(i) 
+                message = extract.dpkg_message(i) 
                 
-                data_format = [(time, tty, user, dir, command)]
+                data_format = [(date, time, message)]
 
-                ## line to filter out non shell login logs - need to get the session opened ones in as well
-                if 'TTY' in i:
-                    ## The for loop is for the formatting so pandas can read/index it properly
-                    for i in data_format:
-                        data.lst_init.df_list.append(i)
-                else:
-                    pass
-                    #print("skipping line")
+                ## The for loop is for the formatting so pandas can read/index it properly
+                for i in data_format:
+                    data.lst_init.df_list.append(i)
 
             display.dataframe()
             main()
+
 
     def search(search_term):
         print(utility.size_check(LOG_DIR))
@@ -104,26 +98,20 @@ class sorter:
         with open(LOG_DIR, "r") as log_contents:
 
             for i in track(log_contents, description="Loading log file...", total = utility.file_count(LOG_DIR)):
-                command = extract.command(i) 
-                time = extract.time(i) 
-                tty = extract.TTY(i)
-                dir = extract.dir(i)
-                user = extract.user(i)
-                
-                data_format = [(time, tty, user, dir, command)] ## list of what is ablove, ex ip, host, etc
+                time = extract.time(i)
+                date = extract.date(i) 
+                message = extract.dpkg_message(i) 
+
+                data_format = [(date, time, message)] ## list of what is ablove, ex ip, host, etc
                 
                 ## temp try except to fix search issues
                 try:
-                    if search_term in command:
+                    if search_term in time:
                         add = True
-                    elif search_term in time:
-                        add = True
-                    elif search_term in tty:
-                        add = True
-                    elif search_term in dir:
-                        add = True
-                    elif search_term in user:
-                        add = True
+                    elif search_term in date:
+                        add = True     
+                    elif search_term in message:
+                        add = True             
                     else:
                         add = False
                         pass
@@ -137,42 +125,32 @@ class sorter:
             display.dataframe_search()
             main()
         
+    
 class display:
     
     ## seperate for my sanity
     def dataframe():
         display.dataframe_config()
-        df = pd.DataFrame(data.lst_init.df_list, columns=['TIME','TTY','USER', 'DIR', 'COMMAND'])
-
+        df = pd.DataFrame(data.lst_init.df_list, columns=['DATE','TIME','MESSAGE'])
+        
         ## Setting astype which vastly reduces memory usage
-        df["COMMAND"] = df["COMMAND"].astype('category').str[:45] #int16
-        df["TTY"] = df["TTY"].astype('category')
-        df["USER"] = df["USER"].astype('category') 
-        df["DIR"] = df["DIR"].astype('category') 
-        df["TIME"] = df["TIME"].astype('category')
-
-    
+        df["TIME"] = df["TIME"].astype('category') #int16
+        df["DATE"] = df["DATE"].astype('category') #int16    
+        df["MESSAGE"] = df["MESSAGE"].astype('category')          
         display.dataframe.df = df
 
     def dataframe_search():
         display.dataframe_config()
-        df = pd.DataFrame(data.lst_init.df_list_search, columns=['TIME','TTY','USER', 'DIR', 'COMMAND'])
+        df = pd.DataFrame(data.lst_init.df_list_search, columns=['DATE','TIME','MESSAGE'])
         
-        ## Setting astype which vastly reduces memory usage
-        df["COMMAND"] = df["COMMAND"].astype('category') #int16
-        df["TTY"] = df["TTY"].astype('category') 
-        df["USER"] = df["USER"].astype('category') 
-        df["DIR"] = df["DIR"].astype('category') 
-        df["TIME"] = df["TIME"].astype('category') 
-
-
+        df["TIME"] = df["TIME"].astype('category')
+        df["DATE"] = df["DATE"].astype('category') 
+        df["MESSAGE"] = df["MESSAGE"].astype('category')
         display.dataframe_search.df = df
 
     def dataframe_config():
         # == DF options - need to go into config file eventaully
-        pd.options.display.width = 1
-        #pd.set_option('display.max_columns', None)
-        pd.options.display.max_rows = 100
+        pd.options.display.max_rows = 30
         pd.options.display.max_colwidth = 1 # tightens up DF 
         
         pd.set_option("display.colheader_justify","left")
@@ -187,6 +165,7 @@ class data:
         data.lst_init.df_list_search = []
         ## any other lists init here
     
+    ## used for freeing memory at the end of whatever
     def cleanup():
         data.lst_init()
 
@@ -196,43 +175,6 @@ class extract:
     def __init__(self):
         self.self = self
     
-    def command(iter):
-        command = re.compile(r'(COMMAND=).*')
-        try:
-            extracted_command = command.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_command = "EMPTY"
-        return extracted_command.replace("COMMAND=","")
-
-    def TTY(iter):
-        tty = re.compile(r'(TTY=)([^\s]+)')
-        try:
-            extracted_tty = tty.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_tty = "EMPTY"
-        return extracted_tty.replace("TTY=","")
-
-    def dir(iter):
-        dir= re.compile(r'(PWD=)([^\s]+)')
-        try:
-            extracted_dir = dir.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_dir = "EMPTY"
-        return extracted_dir.replace("PWD=","")
-
-    def user(iter):
-        user = re.compile(r'(USER=)([^\s]+)')
-        try:
-            extracted_user = user.search(iter)[0]
-            #print(extracted_command)
-        except:
-            extracted_user = "EMPTY"
-        return extracted_user.replace("USER=","") 
-
-
     def time(iter):
         time = re.compile(r'..:..:..')
         try:
@@ -242,9 +184,27 @@ class extract:
             extracted_time = "EMPTY"
         return extracted_time
 
+    def date(iter):
+        date = re.compile(r'....-..-..')
+        try:
+            extracted_date = date.search(iter)[0]
+            #print(extracted_command)
+        except:
+            extracted_date = "EMPTY"
+        return extracted_date
     
+    def dpkg_message(iter):
+        message = re.compile(r'.*')
+        try:
+            extracted_message = message.search(iter)[0]
+            #print(extracted_command)
+        except:
+            extracted_message = "EMPTY"
+            # was easier to grab whole message then just cut out first 20 lines, as those will stay the same
+        return extracted_message[20:]
+
+
 def main():
     data.lst_init()
     
 main()
-
