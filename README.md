@@ -37,6 +37,9 @@ Here is a handy chart showing a map of this, with explanations as well:<br>
 **The Auth Module:**<br>
 ![image](https://user-images.githubusercontent.com/91687869/200753786-25b3ddf0-a15f-45f2-ac07-2deb46c303fb.png)<br>
 
+**CLI only distro? No Problem!**<br>
+![image](https://user-images.githubusercontent.com/91687869/200970073-d9a41467-972a-48b5-b92a-17e992de9625.png)
+
 
 **Configuration:** <br>
 
