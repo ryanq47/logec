@@ -2,10 +2,6 @@
 	Explore this: https://www.geeksforgeeks.org/how-to-speedup-pandas-with-with-one-line-change-using-modin/
 	its a multithreaded pandas basically
 	
-	
-Last left off: Working on user install, and setfacl getting proper permissions to see log files
-	       Need to get it added to path, being dumb
-## Note!! if unable to properly/efficently parse a log, just have 1 column, each log line will be it's own line, then it is possible to search 
 
 ==========================================================================================================================================================================
 General Notes:
@@ -20,26 +16,10 @@ Orange/yellow: Warning
 ==========================================================================================================================================================================
 changelog: 
 
-9:30 - 10/20/22: Created update file, started integrity tool, 
 
-10:29 - 08/20/22: Moved over to shell instead of a command per query, added a draw.io map of the basics as well. All notes/documentation is moved to documentation folder
-
-13:31 -08/11/22: Added tabcompletion and history, found ram issue 
-
-18:23 10-14-2022: got a solution for ram usage, in ramload_test_listtry, only problem now is that tehre is an inital spike wehn loading,
-	so need to find a way to set those datatypes pre load
-
-22:46 10-14-2022: turned the dict's into lists, then discovered tuples work, which are way less memroy intensive. log function is complete - there is a way to reduce more memory but rn its good enough
-
-00:45 10-30-22: Fixed the looping issue with log/search by taking out the init lists on each call to log or search. 
-
-10:34 10-30-22: Fixed empty DF error, see issue #1
-
-12:05 11-3-22: Created basic template for sorters, startedon auth log
+11-18-22: Finsihed Auth Log, and DPKG log. Added stats class to utility.py, and a stats method sorters. Create a manual, in documentation/manual
 ==========================================================================================================================================================================
 Issuelog: 
-
-#2 15:14 - 08/26/22 | HIGH: fix search, the ws_shell, and webserver_sorter sees the term, but is not filtering correctly - ?? not sure what this means
 
 #3 15:14 - 08/16/22 | Priority: Medium /\ Ram usage fixed for loading, now need to figure out how to optimize the regex to use less ram
 
@@ -56,7 +36,7 @@ Archived Issuelog:
 
 
 ==========================================================================================================================================================================
-Features:
+Features/Ideas:
 	20:32 - 10/20/22 | high: Idea, integrity, creates a local copy of files, and  stores them.
 		from there, can check if original file  (ex /etc/apache.conf) has been changed.
 			in module, checks just the module's files, outof module, checks all
@@ -67,6 +47,8 @@ Features:
 		work: Medium
 	
 	23:16 - 08/26/22 | Medium: Ingrate Moudle into IP rep check, the manually entered IP works
+
+	11-18-22: Create graphs in terminal
 
 
 ==========================================================================================================================================================================

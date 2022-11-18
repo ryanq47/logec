@@ -1,0 +1,130 @@
+'''
+Manual
+
+General Usage:
+    Modules (Path: Modules/, and Modules/syslogs, depending if log is a system log, or an application log):
+        A module is a combination of a sorter, and its respective shell. There are multiple modules in logec, usually one for each major log in a system 
+            EX: webserver, auth, dpkg
+        To enter a module, type its name (you can check all available commands by hitting tab twice) it will drop you into said modules shell. From here, you can search, or display logs from said
+        module. For example, if I type 'webserver', then 'log', it will display all webserver logs. Some moduels have differnt log options, such as auth having 'session' or 'commmand'. 
+        This is due to multiple log types being recorded within auth.log (see sorter class below for more detailed info). 'session' will display sessions, and 'command' will display commands run as sudo
+
+
+        
+    Tools (Path: Modules/tools):
+        Tools are additional add-ons to logec that make it more than just a log viewer. For example, the 'reputation' tool will run any ip address by a set of known bad IP's, or the 'integrity' tool
+        will make a 'golden copy' of sensitive files, and comapare that 'golden copy' to the current running file. That way, a user can tell if their file has been tampered with by a malicious actor. (note, the integrity tool is being worked on, but not yet out)
+        
+    The Config File (Path: config/*):
+        At the moment, there are 2 config files. 
+            1) log_locations.yml:
+                This is the config file where logec looks to get log files from. It is written in YAML format for easy configuration
+            2) general_config.yml:
+                This is where the more general config items/options go, each item will have a description of what it does, and I tried to name them as clear as possible.
+            
+
+
+Dev Manual
+
+Shell:
+    The shells are frontend to each sorter. For organizational purposes, it was better to have a shell + sorter, instead of the 2 lumped together. At the moment, the shells are a little messy, so instead
+    of describing each function, I will just talk about how they work. In a nutshell, their main job is to pass commands to the sorter, and then display the results to said commands/results. Hit tab twice
+    for the options of each shell.
+
+
+
+Sorters:
+    The sorters rely on 2 things to do their jobs, regex, and pandas dataframes. 
+    Breaking the sorters down, there are 3 main classes
+        1) 'sorter' class
+            The sorter class contains the main logic of the sorters. Here, based on the command inputted by the user, different a different method will be called
+            Each method uses a for loop to iterate through each line in a log file. For each line, a regex is run over it, extracting the data it needs (time, date, etc) From here, said data is put into a tuple (for memory savings), and put into a global list. The method then calls its respective dataframe method to display data.
+
+            This may be confusing, but something to note about the sorter methods, if the content of a log file varies (such as auth.log) there needs to be a seperate method for each log format. if it is uniform
+            like a webserver log (ex apache logs), you don't have to worry about this 
+                EX: 
+                    'Nov 18 13:25:01 Ronans-Surface-Pro CRON[5112]: pam_unix(cron:session): session closed for user root'
+                    'Nov 18 09:47:05 Ronans-Surface-Pro sudo:     kali : TTY=pts/1 ; PWD=/home/kali/Documents/termgraph-master/examples ; USER=root ; COMMAND=/usr/bin/apt-get install python3-setuptools'
+                As you can see above, these lines have 2 different sets of data in them, one for sessions, and one for a command run by sudo, so there is a 
+                different method for each. (look in the auth_sorter, specifically how 'sessions' has its own method, and its own dataframe)
+                
+
+        2) 'Display' class
+            The display class controls the pretty part of the whole process, with panda dataframes. Each method calls the config method (located at bottom of display class), and sets 
+            the 'df' variable with the items it needs to display. Underneath this, are 'astypes' commands, which sets the data types, thus reducing memory usage on big lists. 
+            At the bottom of each method, the 'display.dataframe.df = df' variable is set, and it contains the dataframe. (the shell pulls from this to display)
+
+            Last but not least in the display class, is the stats method. It's responsible for 2 things, retrieveing stats from the CURRENT ON SCREEN logs (using utility.py) and wiping the lists - as it is intended to be the last called item in the shells
+            Unfortunently, I am not a python genius - so the stats are hard coded in, meaning that the user cannot change what stat categories are shown without editing the sorter. I've tried my best to make them as relevant as possible to the data on screen.
+            However, there is (sort of) a way around this, the dataframe prints the amount of rows it has, so if you search with the correct terms, it will tell you the amount of rows that have appeared, and you can use that for ad-hoc stats (specifically helpful for NCL, or similar competitions)
+            
+        3) 'Extract' class
+            The extract class is where all the regex lives. When a method in the Sorter class runs, it calls whatever extract method it needs to extract data from a log file. Each method returns
+            either the data it extracted, or 'EMPTY' to show no data has been found
+
+'''
+
+
+Modules:
+    General Notes:
+        searching does not have any wildcard characters, instead it uses partial (or whole) string matching - if you search for "ro", anything with "ro" in it will be displayed
+
+    webserver:
+        The webserver module pulls data from Apache web logs.
+        
+        Commands:
+            log: Displays all logs
+            search: searches entire log file for term
+
+
+                Pros:
+                    - Easy view of apache logs
+                Cons:
+                    - Designed on Apache, may not work with other webserver log files
+
+        Example Log:
+            IP         TIME                           ... URL               AGENT                    
+        0     127.0.0.1  [08/Nov/2022:14:49:56 -0600]  ...  GET /randomfile1  PC / Windows XP / IE 6.0
+        
+
+
+
+    auth:
+        Auth is a module which pulls successful logins, and commands from the auth.log file in linx.
+
+        Commands:
+            log: Displays all logs
+            search: searches entire log file for term
+            session: displays all session logs
+            command: dispalys all commands run by root/sudo
+
+            Pros:
+                    - Easy view of current/past sessions
+            Cons:
+                    - Does not include all of auth.log, only succesful (and potentially local) logins
+
+        Example Command Log:
+        TIME      TTY    USER  DIR           COMMAND  
+        2  14:35:42  pts/1  root  /var/log      /usr/bin/nano auth.log  
+
+        Example Session log: 
+        0     Nov 13  00:05:01      pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+
+
+
+    dpkg:
+        Dpkg is a module which shows everything dpkg has done - aka all installed, modified, and removed software
+
+        Commands:
+            log: Displays all logs
+            search: searches entire log file for term
+
+                Pros:
+                    - Easy view of software history
+                Cons:
+                    - None at this time... it is a pretty simple/basic log
+                        - One thing to note is that the user is not shown, as it is not included in the log file
+
+        Example Log:
+        DATE        TIME      MESSAGE 
+        2022-11-08  21:30:34  status installed ssh:all 1:9.0p1-1 

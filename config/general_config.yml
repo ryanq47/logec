@@ -1,4 +1,4 @@
 ## General
 startup:
-  auto-update: False
-  print-settings-on-startup: True
+  auto-update: False ## automatically updates malicous IP's and other time sensitive items
+  print-settings-on-startup: True ## Displays settings on startup

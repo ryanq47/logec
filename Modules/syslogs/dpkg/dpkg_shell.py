@@ -79,12 +79,12 @@ DATE        TIME      MESSAGE
 
     elif input == "log":
         dpkg.sorter.sort()
-        print(dpkg.display.dataframe.df)
+        print(f"{dpkg.display.dataframe.df}\n{dpkg.display.stats()}")
 
     elif "search" in input:
         search_term = input.replace("search ", "")
         dpkg.sorter.search(search_term)
-        print(dpkg.display.dataframe_search.df)
+        print(f"{dpkg.display.dataframe_search.df}\n{dpkg.display.stats()}")
 
     else:
         #print("TEMP DEBUG FEATURE. DANGEROUS")

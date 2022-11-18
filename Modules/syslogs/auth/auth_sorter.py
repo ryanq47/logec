@@ -77,25 +77,31 @@ class sorter:
         
             ## filtering for each value
             for i in track(log_contents, description="Loading log file...", total=utility.file_count(LOG_DIR)):
+
                 command = extract.command(i) 
-                time = extract.time(i) 
+                time = extract.time(i)
+                date = extract.date(i) 
                 tty = extract.TTY(i)
                 dir = extract.dir(i)
                 user = extract.user(i)
+                session = extract.session(i)
+                ## session add on
+                data_format = [(date, time, tty, user, dir, command, session)]
                 
-                data_format = [(time, tty, user, dir, command)]
-
-                ## line to filter out non shell login logs - need to get the session opened ones in as well
-                if 'TTY' in i:
-                    ## The for loop is for the formatting so pandas can read/index it properly
-                    for i in data_format:
-                        data.lst_init.df_list.append(i)
+                if "opened" in session:
+                    data.lst_stats.success_login.append(i)
+                elif "authentication failure" in session:
+                    data.lst_stats.fail_login.append(i)
                 else:
                     pass
-                    #print("skipping line")
 
+                    ## line to filter out non shell login logs - need to get the session opened ones in as well
+                    #if 'TTY' in i:
+                        ## The for loop is for the formatting so pandas can read/index it properly
+                for i in data_format:
+                    data.lst_init.df_list.append(i)
             display.dataframe()
-            main()
+
 
     def search(search_term):
         print(utility.size_check(LOG_DIR))
@@ -106,23 +112,32 @@ class sorter:
             for i in track(log_contents, description="Loading log file...", total = utility.file_count(LOG_DIR)):
                 command = extract.command(i) 
                 time = extract.time(i) 
+                date = extract.date(i) 
                 tty = extract.TTY(i)
                 dir = extract.dir(i)
                 user = extract.user(i)
+                ## Session add on
+                session = extract.session(i)
                 
-                data_format = [(time, tty, user, dir, command)] ## list of what is ablove, ex ip, host, etc
+                data_format = [(date, time, tty, user, dir, command, session)] ## list of what is ablove, ex ip, host, etc
                 
-                ## temp try except to fix search issues
+                
+
+                
                 try:
                     if search_term in command:
                         add = True
                     elif search_term in time:
+                        add = True
+                    elif search_term in date:
                         add = True
                     elif search_term in tty:
                         add = True
                     elif search_term in dir:
                         add = True
                     elif search_term in user:
+                        add = True
+                    elif search_term in session:
                         add = True
                     else:
                         add = False
@@ -134,15 +149,79 @@ class sorter:
                 if add == True: 
                     for i in data_format:
                         data.lst_init.df_list_search.append(i)
+                    
+                    ## only appends if it shows up in search
+                    if "opened" in session:
+                        data.lst_stats.success_login.append(i)
+                    elif "authentication failure" in session:
+                        data.lst_stats.fail_login.append(i)
+                    else:
+                        pass
+                    
             display.dataframe_search()
-            main()
+            
+    def session():
+        print(utility.size_check(LOG_DIR))
+        ## File open
+        with open(LOG_DIR, "r") as log_contents:
+            
+            ## filtering for each value
+            for i in track(log_contents, description="Loading log file...", total=utility.file_count(LOG_DIR)):
+                if "pam_unix" in i:
+                    session = extract.session(i) 
+                    time = extract.time(i)
+                    date = extract.date(i) 
+
+                    data_format = [(date, time, session)]
+                    
+                    if "opened" in session:
+                        data.lst_stats.success_login.append(i)
+                    elif "authentication failure" in session:
+                        data.lst_stats.fail_login.append(i)
+                    else:
+                        pass                    
+                    
+                    for i in data_format:
+                        data.lst_init.df_list_session.append(i)
+                else:
+                    pass
+            display.dataframe_session()
+                  
+    def command():
+        print(utility.size_check(LOG_DIR))
+        ## File open
+        with open(LOG_DIR, "r") as log_contents:
         
+            ## filtering for each value
+            for i in track(log_contents, description="Loading log file...", total=utility.file_count(LOG_DIR)):
+                if "TTY" in i:
+                    command = extract.command(i) 
+                    time = extract.time(i)
+                    date = extract.date(i) 
+                    tty = extract.TTY(i)
+                    dir = extract.dir(i)
+                    user = extract.user(i)
+                        
+                    data_format = [(date, time, tty, user, dir, command)]
+
+                        ## line to filter out non shell login logs - need to get the session opened ones in as well
+                        #if 'TTY' in i:
+                            ## The for loop is for the formatting so pandas can read/index it properly
+                    for i in data_format:
+                        data.lst_init.df_list_command.append(i)
+                else:
+                    pass
+                ## NOTE: this is not grabbing commands, investigate and fix
+            display.dataframe_command()
+           
+     
+             
 class display:
     
     ## seperate for my sanity
     def dataframe():
         display.dataframe_config()
-        df = pd.DataFrame(data.lst_init.df_list, columns=['TIME','TTY','USER', 'DIR', 'COMMAND'])
+        df = pd.DataFrame(data.lst_init.df_list, columns=['DATE','TIME','TTY','USER', 'DIR', 'COMMAND', 'SESSION'])
 
         ## Setting astype which vastly reduces memory usage
         df["COMMAND"] = df["COMMAND"].astype('category').str[:45] #int16
@@ -150,13 +229,13 @@ class display:
         df["USER"] = df["USER"].astype('category') 
         df["DIR"] = df["DIR"].astype('category') 
         df["TIME"] = df["TIME"].astype('category')
-
-    
+        df["DATE"] = df["DATE"].astype('category')
+        df["SESSION"] = df["SESSION"].astype('category')
         display.dataframe.df = df
 
     def dataframe_search():
         display.dataframe_config()
-        df = pd.DataFrame(data.lst_init.df_list_search, columns=['TIME','TTY','USER', 'DIR', 'COMMAND'])
+        df = pd.DataFrame(data.lst_init.df_list_search, columns=['DATE','TIME','TTY','USER', 'DIR', 'COMMAND', 'SESSION'])
         
         ## Setting astype which vastly reduces memory usage
         df["COMMAND"] = df["COMMAND"].astype('category') #int16
@@ -164,9 +243,31 @@ class display:
         df["USER"] = df["USER"].astype('category') 
         df["DIR"] = df["DIR"].astype('category') 
         df["TIME"] = df["TIME"].astype('category') 
-
+        df["DATE"] = df["DATE"].astype('category')
+        df["SESSION"] = df["SESSION"].astype('category')
 
         display.dataframe_search.df = df
+
+    def dataframe_session():
+        display.dataframe_config()
+        df = pd.DataFrame(data.lst_init.df_list_session, columns=['DATE','TIME','SESSION'])
+        
+        ## Setting astype which vastly reduces memory usage
+        df["SESSION"] = df["SESSION"].astype('category') #int16
+        df["TIME"] = df["TIME"].astype('category') 
+        df["DATE"] = df["DATE"].astype('category')
+        display.dataframe_session.df = df
+
+    def dataframe_command():
+        display.dataframe_config()
+        df = pd.DataFrame(data.lst_init.df_list_command, columns=['DATE','TIME','TTY','USER', 'DIR', 'COMMAND'])
+        df["COMMAND"] = df["COMMAND"].astype('category').str[:45] #int16
+        df["TTY"] = df["TTY"].astype('category')
+        df["USER"] = df["USER"].astype('category') 
+        df["DIR"] = df["DIR"].astype('category') 
+        df["TIME"] = df["TIME"].astype('category')
+        df["DATE"] = df["DATE"].astype('category')
+        display.dataframe_command.df = df
 
     def dataframe_config():
         # == DF options - need to go into config file eventaully
@@ -177,6 +278,19 @@ class display:
         
         pd.set_option("display.colheader_justify","left")
 
+    
+    def stats():
+        try:
+            message = (f"Successful Authentication: {utility.stats.num_count(data.lst_stats.success_login)} Failed Authentication (search failure for specific results): {utility.stats.num_count(data.lst_stats.fail_login)} ")
+            print()
+            ## Nuking the lists after they hit the last function to be called, stats
+            data.cleanup()
+            return(message)
+        except:
+            data.cleanup()
+            return("stats not found")
+        
+
 class data:
     def __init__(self):
         self.self = self
@@ -185,11 +299,18 @@ class data:
         
         data.lst_init.df_list = []
         data.lst_init.df_list_search = []
+        data.lst_init.df_list_session = []
+        data.lst_init.df_list_command = []
         ## any other lists init here
-    
+        
+    def lst_stats():
+        data.lst_stats.success_login = []
+        data.lst_stats.fail_login = []
+        
+    ## used for freeing memory at the end of whatever
     def cleanup():
         data.lst_init()
-
+        data.lst_stats()
 
 
 class extract:
@@ -241,10 +362,28 @@ class extract:
         except:
             extracted_time = "EMPTY"
         return extracted_time
+    def date(iter):
+        date = re.compile(r'[a-zA-Z]+ ..')
+        try:
+            extracted_date = date.search(iter)[0]
+            #print(extracted_command)
+        except:
+            extracted_date = "EMPTY"
+        return extracted_date
+    
+    def session(iter):
+        session = re.compile(r'pam_unix.+')
+        try:
+            extracted_session = session.search(iter)[0]
+            #print(extracted_command)
+        except:
+            extracted_session = "EMPTY"
+        return extracted_session
 
     
-def main():
-    data.lst_init()
+#def main():
+    #data.lst_init()
     
-main()
+#
+data.cleanup()
 

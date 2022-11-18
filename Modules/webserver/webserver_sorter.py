@@ -81,25 +81,22 @@ class sorter:
             ## filtering for each value
             for i in track(log_contents, description="Loading log file...", total=utility.file_count(LOG_DIR)):
                 ip = extract.ip(i) #"127.0.0.1"
+                data.lst_stats.ip.append(ip)
                 time = extract.time(i) #"TIME"
                 geo = extract.geo(i) #"GEO"
                 code = extract.code(i) #"400"
+                data.lst_stats.code.append(i)
                 method = extract.method(i) #"test"
                 url = extract.url(i) #"test"
                 agent = extract.user_agent(i) ## << SLOW
-
-                ## Doc: https://www.geeksforgeeks.org/creating-a-pandas-dataframe-using-list-of-tuples/
-                ## optmizing tuple: https://www.geeksforgeeks.org/tips-to-reduce-python-object-size/
-                ## tuple in a list, much easier on memry than dict in a list
 
                 data_format = [(ip, time, geo, method, code, url, agent)]
 
                 ## The for loop is for the formatting so pandas can read/index it properly
                 for i in data_format:
                     data.lst_init.df_list.append(i)
-
             display.dataframe()
-            main()
+
 
 
     def search(search_term):
@@ -110,12 +107,15 @@ class sorter:
 
             for i in track(log_contents, description="Loading log file...", total = utility.file_count(LOG_DIR)):
                 ip = extract.ip(i) #"127.0.0.1"
+                data.lst_stats.ip.append(ip)
                 time = extract.time(i) #"TIME"
                 geo = extract.geo(i) #"GEO"
                 code = extract.code(i) #"400"
+                data.lst_stats.code.append(i)
                 method = extract.method(i) #"test"
                 url = extract.url(i) #"test"
                 agent = extract.user_agent(i) ## << SLOW
+                
 
                 data_format = [(ip, time, geo, method, code, url, agent)]
                 
@@ -146,21 +146,14 @@ class sorter:
                     for i in data_format:
                         data.lst_init.df_list_search.append(i)
             display.dataframe_search()
-            main()
-        
-    
+
 class display:
     
     ## seperate for my sanity
     def dataframe():
         display.dataframe_config()
         df = pd.DataFrame(data.lst_init.df_list, columns=['IP', 'TIME', 'LOCATION', 'METHOD', 'RESPONSE_CODE', 'URL', 'AGENT'])
-        #df.style.set_properties(**{'text-align': 'left'})
-        #To reduce mem usage, can set types like this (int8 = -128 to 127, int16 = -32k to 32k)
-        ## However, still getting mem spikes, so maybe these need to go infront somehow
-        #doc: https://skytowner.com/explore/reducing_dataframe_memory_size_in_pandas#:~:text=There%20are%20two%20main%20ways%20to%20reduce%20DataFrame,types%202%20Convert%20object%20columns%20to%20categorical%20columns
-        
-        ## Setting astype which vastly reduces memory usage
+
         df["RESPONSE_CODE"] = df["RESPONSE_CODE"].astype('category') #int16
         df["IP"] = df["IP"].astype('category') 
         df["TIME"] = df["TIME"].astype('category') 
@@ -174,12 +167,7 @@ class display:
     def dataframe_search():
         display.dataframe_config()
         df = pd.DataFrame(data.lst_init.df_list_search, columns=['IP', 'TIME', 'LOCATION', 'METHOD', 'RESPONSE_CODE', 'URL', 'AGENT'])
-        #df.style.set_properties(**{'text-align': 'left'})
-        #To reduce mem usage, can set types like this (int8 = -128 to 127, int16 = -32k to 32k)
-        ## However, still getting mem spikes, so maybe these need to go infront somehow
-        #doc: https://skytowner.com/explore/reducing_dataframe_memory_size_in_pandas#:~:text=There%20are%20two%20main%20ways%20to%20reduce%20DataFrame,types%202%20Convert%20object%20columns%20to%20categorical%20columns
-        
-        ## Setting astype which vastly reduces memory usage
+
         df["RESPONSE_CODE"] = df["RESPONSE_CODE"].astype('category') #int16
         df["IP"] = df["IP"].astype('category') 
         df["TIME"] = df["TIME"].astype('category') 
@@ -196,6 +184,17 @@ class display:
         pd.options.display.max_colwidth = 1 # tightens up DF 
         
         pd.set_option("display.colheader_justify","left")
+    
+    def stats():
+        try:
+            message = (f"Unique IP's: {utility.stats.num_unique(data.lst_stats.ip)} ")
+            ## Nuking the lists after they hit the last function to be called, stats
+            data.cleanup()
+            return(message)
+        except:
+            data.cleanup()
+            return("Data not found")
+        
 
 class data:
     def __init__(self):
@@ -206,10 +205,14 @@ class data:
         data.lst_init.df_list = []
         data.lst_init.df_list_search = []
         ## any other lists init here
-    
+    def lst_stats():
+        data.lst_stats.ip = []
+        data.lst_stats.code = []
+        
     ## used for freeing memory at the end of whatever
     def cleanup():
         data.lst_init()
+        data.lst_stats()
 
 
 
@@ -286,5 +289,6 @@ class extract:
 def main():
     ## This is here to fix the dataframes getting wiped on multiple calls to parse the logs
     data.lst_init()
+    data.lst_stats()
     
 main()

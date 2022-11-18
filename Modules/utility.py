@@ -93,3 +93,10 @@ class performance:
 
 
     
+class stats:
+    def num_unique(item):
+        number = len(set(item))
+        return(number)
+    def num_count(item):
+        number = len(item)
+        return(number)

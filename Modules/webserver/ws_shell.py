@@ -78,12 +78,13 @@ Example Log:
     elif input == "log":
         #ws.main()
         ws.sorter.sort()
-        print(ws.display.dataframe.df)
+        print(f"{ws.display.dataframe.df}\n{ws.display.stats()}")
+
 
     elif "search" in input:
         search_term = input.replace("search ", "")
         ws.sorter.search(search_term)
-        print(ws.display.dataframe_search.df)
+        print(f"{ws.display.dataframe_search.df}\n{ws.display.stats()}")
 
     else:
         #print("TEMP DEBUG FEATURE. DANGEROUS")

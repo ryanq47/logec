@@ -35,7 +35,7 @@ def main():
 
 def tab_completion(text,state):  
     # autofill words   
-    vocab = ['log','search','info']
+    vocab = ['log','search','info','command', 'session']
     results = [x for x in vocab if x.startswith(text)] + [None]
     return results[state]
 
@@ -63,7 +63,7 @@ def command(input):
         return(loop_func.logec_banner())
 
     elif input == "info":
-        print("""Auth is a module which pulls successful logins from the auth.log file in linx.
+        print("""Auth is a module which pulls successful logins, and commands from the auth.log file in linx.
 
         Pros:
             - Easy view of current/past sessions
@@ -78,12 +78,23 @@ Example Log:
 
     elif input == "log":
         auth.sorter.sort()
-        print(auth.display.dataframe.df)
+        print(f"{auth.display.dataframe.df}\n{auth.display.stats()}")
+        
+
 
     elif "search" in input:
         search_term = input.replace("search ", "")
         auth.sorter.search(search_term)
-        print(auth.display.dataframe_search.df)
+        print(f"{auth.display.dataframe_search.df}\n{auth.display.stats()}")
+
+    elif input == "session":
+        auth.sorter.session()
+        print(f"{auth.display.dataframe_session.df}\n{auth.display.stats()}")
+
+
+    elif input == "command":
+        auth.sorter.command()
+        print(f"{auth.display.dataframe_command.df}\n{auth.display.stats()}")
 
     else:
         #print("TEMP DEBUG FEATURE. DANGEROUS")

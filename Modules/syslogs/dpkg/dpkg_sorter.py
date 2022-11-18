@@ -82,13 +82,17 @@ class sorter:
                 message = extract.dpkg_message(i) 
                 
                 data_format = [(date, time, message)]
+                
+                if "status installed" in i:
+                    data.lst_stats.installed_package.append(i)
+                else:
+                    pass
 
                 ## The for loop is for the formatting so pandas can read/index it properly
                 for i in data_format:
                     data.lst_init.df_list.append(i)
 
             display.dataframe()
-            main()
 
 
     def search(search_term):
@@ -117,13 +121,18 @@ class sorter:
                         pass
                 except Exception as e:
                     add = False
-                    #print(e)
+                    print(e)
                     
                 if add == True: 
+                    if "succesfully installed" in i:
+                        data.lst_stats.installed_package.append(i)
+                        
                     for i in data_format:
                         data.lst_init.df_list_search.append(i)
+                        
+
+                    
             display.dataframe_search()
-            main()
         
     
 class display:
@@ -155,6 +164,17 @@ class display:
         
         pd.set_option("display.colheader_justify","left")
 
+    def stats():
+        try:
+            message = (f"Installed Packages (according to log) {utility.stats.num_count(data.lst_stats.installed_package)}")
+            print()
+            ## Nuking the lists after they hit the last function to be called, stats
+            data.cleanup()
+            return(message)
+        except:
+            data.cleanup()
+            return("stats not found")
+
 class data:
     def __init__(self):
         self.self = self
@@ -165,10 +185,13 @@ class data:
         data.lst_init.df_list_search = []
         ## any other lists init here
     
+    def lst_stats():
+        data.lst_stats.installed_package = []
+        
     ## used for freeing memory at the end of whatever
     def cleanup():
         data.lst_init()
-
+        data.lst_stats()
 
 
 class extract:
@@ -206,5 +229,6 @@ class extract:
 
 def main():
     data.lst_init()
+    data.lst_stats()
     
 main()

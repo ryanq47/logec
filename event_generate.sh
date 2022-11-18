@@ -1,4 +1,9 @@
-echo "Starting, and connecting to webserver to generate logs..."
+echo "Intentionally put in a bad password to create a failed authentication log:"
+
+sudo su
+
+
+echo "connecting to webserver to generate logs..."
 
 sudo systemctl start apache2
 
@@ -15,5 +20,6 @@ do
     sudo echo "Hello There" $i
 
 done
+
 
 echo "Done! Go check logec and see what is has found"
